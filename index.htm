@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" ></script>
+    
+    <title>Document</title>
+
+    <style>
+
+        body{
+            background-color: #000;
+            color: #fff;
+            font-family: monospace;
+        }
+
+        table{
+            cursor: pointer;
+        }
+
+        tr{
+            line-height: 6px;
+        }
+
+        table .square{
+            background-color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Conway's Game of Life</h1>
+    <button onclick="tick()">Tick</button>
+    <button onclick="autoTick()">Auto Tick</button>
+    <table id='canvas' border="1">
+
+    </table>
+
+    <script>
+
+        var table;
+        var newTable;
+        var widht = height = 30;
+
+        (function init(){
+            var content = "";
+            for(i = 0; i < height; i++){
+                content += "<tr>";
+                for(j = 0; j < widht; j++){
+                    content += "<td class='dot'>&nbsp;</td>";
+                }
+                content += "</tr>";
+            }
+            var canvas = document.getElementById("canvas");
+            canvas.innerHTML = content;
+
+            $('td').on('click', function(){
+                if($(this).hasClass('dot')){
+                    $(this).removeClass('dot');
+                    $(this).addClass('square');
+                }else{
+                    $(this).removeClass('square');
+                    $(this).addClass('dot');
+                }
+                
+            });
+        })();
+
+        function captureTable(){
+            table = [];
+            newTable = [];
+            $('tr').each(function(i, element){
+                table[i] = [];
+                newTable[i] = [];
+                $(element).find('td').each(function(j, inElement){
+                    if($(inElement).hasClass('dot')){
+                        table[i][j] = 0;
+                    }else{
+                        table[i][j] = 1;
+                    }
+                })
+            });
+        }
+
+        function printTable(){
+            var content = "";
+
+            for(var i in newTable){
+                content += "<tr>";
+                for(var j in newTable[i]){
+                    if(newTable[i][j] == 1){ 
+                        content += "<td class='square'>&nbsp;</td>"; 
+                    }else{
+                        content += "<td class='dot'>&nbsp;</td>"; 
+                    }
+                    
+                }
+                content += "</tr>";
+            }
+
+            var canvas = document.getElementById("canvas");
+            canvas.innerHTML = content;
+
+            $('td').on('click', function(){
+                if($(this).hasClass('dot')){
+                    $(this).removeClass('dot');
+                    $(this).addClass('square');
+                    //$(this).html('■');
+                }else{
+                    $(this).removeClass('square');
+                    $(this).addClass('dot');
+                    //$(this).html('•');
+                }
+            });            
+
+        }
+
+        function tick(){
+            captureTable();
+
+            for(var i in table){
+                for(var j in table[i]){
+                    if(isAlive(parseInt(i), parseInt(j))){
+                        newTable[i][j] = 1;
+                    }else{
+                        newTable[i][j] = 0;
+                    }
+                }
+            }
+            printTable();
+        }
+
+        function autoTick(){
+            setInterval(tick, 500);
+        }
+
+        function isAlive(i , j){
+            var neighbors = 0;
+
+            if(i > 0){
+                if(table[i-1][j] == 1){ neighbors++; }
+            }
+            
+            if(j > 0){
+                if(table[i][j-1] == 1){ neighbors++; }
+            }
+
+            if(i > 0 && j > 0){
+                if(table[i-1][j-1] == 1){ neighbors++; }
+            }
+
+            if(i > 0 && j < height){
+                if(table[i-1][j+1] == 1){ neighbors++; }
+            }
+            
+            if(i < widht-1 ){
+                if(table[i+1][j] == 1){ neighbors++; }
+            }
+
+            if(j < height){
+                if(table[i][j+1] == 1){ neighbors++; }
+            }
+
+            if(i < widht-1 && j < height-1){
+                if(table[i+1][j+1] == 1){ neighbors++; }
+            }
+            if(i < widht-1 && j > 0){
+                if(table[i+1][j-1] == 1){ neighbors++; }
+            }
+            
+            if(table[i][j] == 1 && neighbors == 2){
+                return true;
+            }
+
+            if(table[i][j] == 1 && neighbors == 3){
+                return true;
+            }
+
+            if(table[i][j] == 0 && neighbors == 3){
+                return true;
+            }
+
+            return false;
+            
+        }
+
+    </script>
+
+</body>
+</html>
